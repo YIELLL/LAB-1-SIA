@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#ffffff">
+  <title>Calculator | Lab Activity #1</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="calculator.js" defer></script>
+</head>
+<body>
+  <main class="calculator" aria-label="Calculator">
+    <header class="calculator-header">
+      <h1>Calculator</h1>
+      <button class="advanced-toggle" id="advanced-toggle" type="button" aria-expanded="false" aria-controls="advanced-keys">
+        <span>Advanced</span>
+        <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m5 7.5 5 5 5-5" /></svg>
+      </button>
+    </header>
+
+    <section class="display" aria-label="Calculator display" aria-live="polite" aria-atomic="true">
+      <div class="expression" id="expression">&nbsp;</div>
+      <output class="result" id="result">0</output>
+    </section>
+
+    <section class="advanced-keys" id="advanced-keys" aria-label="Scientific functions" hidden>
+      <button class="key key-function" type="button" data-value="sin">sin</button>
+      <button class="key key-function" type="button" data-value="cos">cos</button>
+      <button class="key key-function" type="button" data-value="tan">tan</button>
+      <button class="key key-function" type="button" data-value="sqrt">√</button>
+      <button class="key key-function" type="button" data-value="log">log</button>
+      <button class="key key-function" type="button" data-value="ln">ln</button>
+      <button class="key key-function" type="button" data-value="^">xʸ</button>
+      <button class="key key-function" type="button" data-value="square">x²</button>
+      <button class="key key-function" type="button" data-value="(">(</button>
+      <button class="key key-function" type="button" data-value=")">)</button>
+      <button class="key key-function" type="button" data-value="pi">π</button>
+      <button class="key key-function" type="button" data-value="e">e</button>
+    </section>
+
+    <section class="keypad" aria-label="Calculator keys">
+      <button class="key key-function" type="button" data-action="clear">AC</button>
+      <button class="key key-function" type="button" data-action="backspace" aria-label="Backspace">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h11v14H9l-6-7 6-7Z"/><path d="m12 9 5 5m0-5-5 5"/></svg>
+      </button>
+      <button class="key key-function" type="button" data-value="%">%</button>
+      <button class="key key-operator" type="button" data-value="÷" aria-label="Divide">÷</button>
+
+      <button class="key" type="button" data-value="7">7</button>
+      <button class="key" type="button" data-value="8">8</button>
+      <button class="key" type="button" data-value="9">9</button>
+      <button class="key key-operator" type="button" data-value="×" aria-label="Multiply">×</button>
+
+      <button class="key" type="button" data-value="4">4</button>
+      <button class="key" type="button" data-value="5">5</button>
+      <button class="key" type="button" data-value="6">6</button>
+      <button class="key key-operator" type="button" data-value="−" aria-label="Subtract">−</button>
+
+      <button class="key" type="button" data-value="1">1</button>
+      <button class="key" type="button" data-value="2">2</button>
+      <button class="key" type="button" data-value="3">3</button>
+      <button class="key key-operator" type="button" data-value="+" aria-label="Add">+</button>
+
+      <button class="key key-function" type="button" data-action="sign" aria-label="Change sign">+/−</button>
+      <button class="key" type="button" data-value="0">0</button>
+      <button class="key" type="button" data-value=".">.</button>
+      <button class="key key-equals" type="button" data-action="equals" aria-label="Equals">=</button>
+    </section>
+
+    <footer class="assignment">
+      <span>Lab Activity #1 · Building Your First System Integration</span>
+      <span>Keniel Drew D. De Asis · September 30, 2026</span>
+    </footer>
+  </main>
+</body>
+</html>
