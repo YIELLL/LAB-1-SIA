@@ -2,9 +2,14 @@ const expressionDisplay = document.querySelector("#expression");
 const resultDisplay = document.querySelector("#result");
 const advancedToggle = document.querySelector("#advanced-toggle");
 const advancedKeys = document.querySelector("#advanced-keys");
+const themeToggle = document.querySelector("#theme-toggle");
+const historyList = document.querySelector("#history-list");
+const historyEmpty = document.querySelector("#history-empty");
+const clearHistoryButton = document.querySelector("#history-clear");
 let expression = "";
 let lastResult = null;
 let afterEquals = false;
+let history = loadHistory();
 
 function tokenize(source) {
   const normalized = source.replaceAll("×", "*").replaceAll("÷", "/").replaceAll("−", "-");
@@ -128,6 +133,80 @@ function formatNumber(value) {
   return Number(value.toPrecision(12)).toString();
 }
 
+function loadHistory() {
+  try {
+    const savedHistory = JSON.parse(localStorage.getItem("calculator-history") || "[]");
+    if (!Array.isArray(savedHistory)) return [];
+    return savedHistory
+      .filter(item => item && typeof item.expression === "string" && typeof item.result === "string")
+      .slice(0, 20);
+  } catch {
+    return [];
+  }
+}
+
+function saveHistory() {
+  try {
+    localStorage.setItem("calculator-history", JSON.stringify(history));
+  } catch {
+    // History remains available for this page session when storage is unavailable.
+  }
+}
+
+function renderHistory() {
+  historyList.replaceChildren();
+  historyEmpty.hidden = history.length > 0;
+  clearHistoryButton.disabled = history.length === 0;
+
+  history.forEach((item, index) => {
+    const listItem = document.createElement("li");
+    const button = document.createElement("button");
+    const priorExpression = document.createElement("span");
+    const priorResult = document.createElement("span");
+
+    button.className = "history-entry";
+    button.type = "button";
+    button.dataset.index = String(index);
+    button.setAttribute("aria-label", `Use ${item.expression} = ${item.result}`);
+    priorExpression.className = "history-expression";
+    priorExpression.textContent = item.expression;
+    priorResult.className = "history-result";
+    priorResult.textContent = `= ${item.result}`;
+    button.append(priorExpression, priorResult);
+    listItem.append(button);
+    historyList.append(listItem);
+  });
+}
+
+function recordCalculation(source, value) {
+  history.unshift({ expression: source, result: value });
+  history = history.slice(0, 20);
+  saveHistory();
+  renderHistory();
+}
+
+function setTheme(isDark) {
+  const theme = isDark ? "dark" : "light";
+  document.documentElement.dataset.theme = theme;
+  themeToggle.setAttribute("aria-pressed", String(isDark));
+  themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+  themeToggle.title = `Switch to ${isDark ? "light" : "dark"} mode`;
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#172027" : "#f2f7ff";
+  try {
+    localStorage.setItem("calculator-theme", theme);
+  } catch {
+    // The selected theme still applies for this page session.
+  }
+}
+
+function loadTheme() {
+  try {
+    return localStorage.getItem("calculator-theme") === "dark";
+  } catch {
+    return false;
+  }
+}
+
 function refreshDisplay() {
   expressionDisplay.textContent = expression || "\u00a0";
   if (!expression) {
@@ -208,7 +287,9 @@ function calculate() {
   try {
     lastResult = evaluate(expression);
     afterEquals = true;
-    resultDisplay.textContent = formatNumber(lastResult);
+    const formattedResult = formatNumber(lastResult);
+    resultDisplay.textContent = formattedResult;
+    recordCalculation(expression.trim(), formattedResult);
   } catch {
     resultDisplay.textContent = "Error";
   }
@@ -248,6 +329,27 @@ advancedToggle.addEventListener("click", () => {
   advancedKeys.hidden = isExpanded;
 });
 
+themeToggle.addEventListener("click", () => {
+  setTheme(document.documentElement.dataset.theme !== "dark");
+});
+
+historyList.addEventListener("click", event => {
+  const button = event.target.closest(".history-entry");
+  if (!button) return;
+  const item = history[Number(button.dataset.index)];
+  if (!item) return;
+  expression = item.expression;
+  lastResult = Number(item.result);
+  afterEquals = true;
+  refreshDisplay();
+});
+
+clearHistoryButton.addEventListener("click", () => {
+  history = [];
+  saveHistory();
+  renderHistory();
+});
+
 document.addEventListener("keydown", event => {
   if (/^\d$/.test(event.key) || event.key === ".") return appendValue(event.key);
   const operators = { "+": "+", "-": "−", "*": "×", "/": "÷", "^": "^", "%": "%", "(": "(", ")": ")" };
@@ -263,4 +365,6 @@ document.addEventListener("keydown", event => {
   if (event.key === "Escape") return clearAll();
 });
 
+setTheme(loadTheme());
+renderHistory();
 refreshDisplay();
